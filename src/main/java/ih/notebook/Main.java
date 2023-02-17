@@ -19,10 +19,20 @@ public class Main {
         boolean continueProgram = true;
 
         do {
-            scanner.useDelimiter("\n\n");
 
-            System.out.println("Enter number of your choice\n*Press enter twice to confirm your choice\n");
-            System.out.println("1- Add note\n2- Read note\n3- Delete note\n0- Save & Exit\n");
+            scanner.reset();
+
+            System.out.println("""
+                    Enter number of your choice
+                    *Press enter to confirm your choice
+                    """);
+            System.out.println("""
+                    1- Add note
+                    2- Read note
+                    3- Update note
+                    4- Delete note
+                    0- Save & Exit
+                    """);
 
             try {
                 choice = scanner.nextInt();
@@ -38,7 +48,8 @@ public class Main {
             switch (choice) {
                 case 1 -> addNote();
                 case 2 -> readNote();
-                case 3 -> deleteNote();
+                case 3 -> updateNote();
+                case 4 -> deleteNote();
                 case 0 -> {
 
                     continueProgram = false;
@@ -57,13 +68,22 @@ public class Main {
     }
 
     public static void addNote() {
+
+        scanner.useDelimiter("\n\n");
         Note note = new Note();
 
-        System.out.println("Enter note title\n*Press enter twice to confirm title\n");
+        System.out.println("""
+                
+                Enter note title
+                *Press enter twice to confirm title
+                """);
 
-        note.setTitle(scanner.next());
+        note.setTitle(scanner.next().trim());
 
-        System.out.println("Enter note description\n*Press enter twice to confirm description\n");
+        System.out.println("""
+                Enter note description
+                *Press enter twice to confirm description
+                """);
 
         String[] tokens;
         tokens = scanner.next().split("\\n");
@@ -73,6 +93,9 @@ public class Main {
         notes.add(note);
 
         printBox("Note added");
+
+        scanner.useDelimiter("\n");
+
     }
 
     public static void readNote() {
@@ -98,6 +121,65 @@ public class Main {
 
             printBox(exception.getMessage());
             readNote();
+
+        }
+    }
+
+    public static void updateNote() {
+        try {
+
+            int index = selectNote();
+            if (index != -1) {
+
+                scanner.useDelimiter("\n\n");
+                Note note = notes.get(index);
+
+                System.out.println("""
+                        
+                        Enter new title
+                        *Press enter twice with empty text field to keep no changes
+                        *Type new title and press enter twice to update it
+                        """);
+
+                String newTitle = scanner.next();
+                if (!newTitle.isEmpty()) {
+                    note.setTitle(newTitle.trim());
+                }
+
+                System.out.println("""
+                        Enter new description
+                        **Press enter twice with empty text field to keep no changes
+                        *Type new description and press enter twice to update it
+                        """);
+
+                String[] tokens;
+                tokens = scanner.next().split("\\n");
+                if (tokens.length != 1 && !tokens[0].isEmpty()) {
+                    note.setDescription(tokens);
+                }
+
+                notes.remove(index);
+                notes.add(index, note);
+
+                printBox("Updated");
+
+                scanner.useDelimiter("\n");
+                scanner.next();
+
+            } else {
+                printBox("Empty");
+            }
+
+        } catch (InputMismatchException exception) {
+
+            printBox("You must enter a number");
+            scanner.next();
+            updateNote();
+
+        } catch (Exception exception) {
+
+            printBox(exception.getMessage());
+            updateNote();
 
         }
     }
@@ -135,7 +217,11 @@ public class Main {
             return -1;
         } else {
 
-            System.out.println("\nEnter number of note to select it\n*Press enter twice to confirm your choice\n");
+            System.out.println("""
+
+                    Enter number of note to select it
+                    *Press enter to confirm your choice
+                    """);
 
             int count = 0;
             for (Note note : notes) {
